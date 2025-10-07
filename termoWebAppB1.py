@@ -29,6 +29,21 @@ def obtener_template_path(cantidadObjetos: int) -> str:
     nombre_template = f"templateTermoN{cantidadObjetos}.docx"
     return os.path.join('templates', nombre_template)
 
+def safe_float_convert(key):
+    value = st.session_state.data.get(key)
+    if value is None:
+        # Si es None (campo vacío), puedes elegir lanzar una excepción
+        # o devolver 0.0, pero dado que ya validaste con 'is None', 
+        # en teoría no debería llegar aquí si falta un campo crítico.
+        raise ValueError(f"Campo crítico vacío: {key}") 
+                
+    # Si el valor ya es un número (float o int), simplemente lo devuelve
+    if isinstance(value, (int, float)):
+        return float(value)
+            
+    # Si es una cadena, reemplaza la coma por punto y convierte a float
+    return float(str(value).replace(',', '.'))
+
 def clasificar_delta(valor_Delta: float, prom_Temperatura: float) -> str:
     """
     Clasifica el valor del delta según los rangos especificados.
@@ -89,9 +104,6 @@ def convertir_a_mayusculas(data):
     else:
         return data  # cualquier otro tipo se deja igual
 
-#if 'doc' not in st.session_state:
-#    st.session_state.doc = DocxTemplate(template_path)
-
 # Inicialización de estado
 if 'step' not in st.session_state:
     st.session_state.step = 1
@@ -140,11 +152,6 @@ if st.session_state.step == 1:
 # Paso 2: Datos Técnicos
 elif st.session_state.step == 2:
     st.header("Paso 2: Datos Técnicos de los Objetos")
-    #st.session_state.data['tensionPrueba'] = st.selectbox("Tensión de Prueba", ["Aceptación", "Mantenimiento"], key='tension')
-    #st.session_state.data['valTensionPrueba'] = 21 if st.session_state.data['tensionPrueba'] == "Aceptación" else 16
-    #tipo = st.selectbox("Tipo de Tramos", ["Trifásicos", "Monofásicos"], key='tipo_tramos')
-    #st.session_state.data['tipoTramos'] = tipo
-    #max_tramos = 10 if tipo == "Trifásicos" else 20
     
     datos_Sin_Mayuscula = st.session_state.data.copy()
     datos = convertir_a_mayusculas(datos_Sin_Mayuscula)
@@ -203,9 +210,6 @@ elif st.session_state.step == 2:
                     continue
                 else:
                     st.success(f"Imagen Termográfica {suf} cargada correctamente.")
-                    buf_ImgTermo = io.BytesIO(st.session_state.data[key_ImgTermo].read()) if st.session_state.data[key_ImgTermo] else None
-                    buf_ImgTermo.seek(0)
-                    datos[key_ImgTermo] = InlineImage(st.session_state.doc, buf_ImgTermo, Cm(7.5), Cm(6.5))
 
             with col2:
                 st.subheader(f"Imagen del Espacio {suf}")
@@ -220,9 +224,6 @@ elif st.session_state.step == 2:
                     continue
                 else:
                     st.success(f"Imagen del Espacio {suf} cargada correctamente.")
-                    buf_ImgEsp = io.BytesIO(st.session_state.data[key_ImgEsp].read()) if st.session_state.data[key_ImgEsp] else None
-                    buf_ImgEsp.seek(0)
-                    datos[key_ImgEsp] = InlineImage(st.session_state.doc, buf_ImgEsp, Cm(7.5), Cm(6.5))
 
             # --- FILA 3: Temperaturas principales ---
             st.subheader(f"Análisis Termográfico {suf}")
@@ -292,13 +293,6 @@ elif st.session_state.step == 2:
                     f"Conclusiones de la Tabla {suf}", key=f'conclusiones{suf}'
                 )
 
-
-            ahora = datetime.now()
-            meses = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"]
-            datos['dia'] = ahora.day
-            datos['mes'] = meses[ahora.month-1]
-            datos['anio'] = ahora.year
-
             st.markdown("---")
     
     
@@ -326,10 +320,10 @@ elif st.session_state.step == 2:
 
             # Si todos los campos críticos están llenos, realiza los cálculos
             try:
-                temp_r = float(st.session_state.data[f'tfaseR{suf}'])
-                temp_s = float(st.session_state.data[f'tfaseS{suf}'])
-                temp_t = float(st.session_state.data[f'tfaseT{suf}'])
-                temp_prom = float(st.session_state.data[f'tempPromImgTermo{suf}'])
+                temp_r = safe_float_convert(f'tfaseR{suf}')
+                temp_s = safe_float_convert(f'tfaseS{suf}')
+                temp_t = safe_float_convert(f'tfaseT{suf}')
+                temp_prom = safe_float_convert(f'tempPromImgTermo{suf}')
 
                 # CÁLCULOS
                 st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(temp_r - temp_s), 2)
@@ -358,11 +352,35 @@ elif st.session_state.step == 2:
 
         # 2. Generación del Word (SOLO si todos los objetos están completos)
         if todos_los_datos_completos:
-            try:
-                # Asegúrate de que los 'datos' para el renderizado incluyan todos los nuevos cálculos
-                #datos = convertir_a_mayusculas(st.session_state.data.copy())
+            
+            datos = convertir_a_mayusculas(st.session_state.data.copy())
+            
+            for i in range(1, cantidad_objetos + 1):
+                suf = f"N{i}"
                 
-                datos = st.session_state.data.copy()
+                key_ImgTermo = f'imgTermografica{suf}'
+                buf_ImgTermo = io.BytesIO(st.session_state.data[key_ImgTermo].read()) if st.session_state.data[key_ImgTermo] else None
+                buf_ImgTermo.seek(0)
+                datos[key_ImgTermo] = InlineImage(st.session_state.doc, buf_ImgTermo, Cm(7.5), Cm(6.5))
+                
+                key_ImgEsp = f'imgEspacio{suf}'
+                buf_ImgEsp = io.BytesIO(st.session_state.data[key_ImgEsp].read()) if st.session_state.data[key_ImgEsp] else None
+                buf_ImgEsp.seek(0)
+                datos[key_ImgEsp] = InlineImage(st.session_state.doc, buf_ImgEsp, Cm(7.5), Cm(6.5))
+            
+            try:
+                
+                ahora = datetime.now()
+                meses = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"]
+                datos['dia'] = ahora.day
+                datos['mes'] = meses[ahora.month-1]
+                datos['anio'] = ahora.year
+                
+                
+                
+                st.session_state.doc.render(datos)
+                output_path = f"reporteProtocoloTermografia.docx"
+                st.session_state.doc.save(output_path)
                 
                 try:
                 
@@ -405,10 +423,6 @@ elif st.session_state.step == 2:
                         else:
                             st.error("Faltan coordenadas para el mapa.")
                     
-                    #st.session_state.doc = DocxTemplate(template_path)
-                    st.session_state.doc.render(datos)
-                    output_path = f"reporteProtocoloTermografia.docx"
-                    st.session_state.doc.save(output_path)
                     st.success(f"Documento generado exitosamente: {output_path}")
                     with open(output_path, "rb") as file:
                         btn = st.download_button(
