@@ -128,7 +128,7 @@ if st.session_state.step == 1:
     st.session_state.data['fechaImagenSinFormato'] = st.date_input("Fecha de Imágenes", key='fecha_imagen', value=datetime.now())
     st.session_state.data['fechaImagen'] = st.session_state.data['fechaImagenSinFormato'].strftime("%Y-%m-%d")
     st.session_state.data['direccionProyecto'] = st.text_input("Dirección", key='direccion')
-    st.session_state.data['cantidadObjetos'] = st.selectbox("Cantidad de Objetos", [1, 2, 3, 4, 14, 15, 16, 17, 18, 19], key='cantidad_perfiles')
+    st.session_state.data['cantidadObjetos'] = st.selectbox("Cantidad de Objetos", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], key='cantidad_perfiles')
     st.session_state.data['latitud'] = st.number_input("Latitud", key='latitud', format="%.6f")
     st.session_state.data['longitud'] = st.number_input("Longitud", key='longitud', format="%.6f")
     #Agregar el campo de selección de Rural o Urbano para la generación de la imagen 
@@ -269,15 +269,15 @@ elif st.session_state.step == 2:
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.session_state.data[f'tfaseR{suf}'] = st.number_input(
-                    f"T-FASE R {suf} [°C]", key=f'tfaseR{suf}', min_value=0.0, format="%.2f"
+                    f"T-FASE R {suf} [°C]", key=f'tfaseR{suf}', format="%.2f"
                 )
             with col2:
                 st.session_state.data[f'tfaseS{suf}'] = st.number_input(
-                    f"T-FASE S {suf} [°C]", key=f'tfaseS{suf}', min_value=0.0, format="%.2f"
+                    f"T-FASE S {suf} [°C]", key=f'tfaseS{suf}', format="%.2f"
                 )
             with col3:
                 st.session_state.data[f'tfaseT{suf}'] = st.number_input(
-                    f"T-FASE T {suf} [°C]", key=f'tfaseT{suf}', min_value=0.0, format="%.2f"
+                    f"T-FASE T {suf} [°C]", key=f'tfaseT{suf}', format="%.2f"
                 )
                 
 
@@ -293,7 +293,7 @@ elif st.session_state.step == 2:
                 )
                 
                 
-            if st.session_state.data[f'deltaRs{suf}'] == 0.0 or st.session_state.data[f'deltaSt{suf}'] == 0.0 or st.session_state.data[f'deltaTr{suf}'] == 0.0:
+            if st.session_state.data[f'tfaseR{suf}'] == 0.0 or st.session_state.data[f'tfaseS{suf}'] == 0.0 or st.session_state.data[f'tfaseT{suf}'] == 0.0:
                 
                 pass
             
