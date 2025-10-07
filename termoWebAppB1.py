@@ -356,73 +356,73 @@ elif st.session_state.step == 2:
                 todos_los_datos_completos = False
                 break
 
-    # 2. Generación del Word (SOLO si todos los objetos están completos)
-    if todos_los_datos_completos:
-        try:
-            # Asegúrate de que los 'datos' para el renderizado incluyan todos los nuevos cálculos
-            #datos = convertir_a_mayusculas(st.session_state.data.copy())
-            
-            datos = st.session_state.data.copy()
-            
+        # 2. Generación del Word (SOLO si todos los objetos están completos)
+        if todos_los_datos_completos:
             try:
-            
-                if st.session_state.data['tipoCoordenada'] == "Urbano":
+                # Asegúrate de que los 'datos' para el renderizado incluyan todos los nuevos cálculos
+                #datos = convertir_a_mayusculas(st.session_state.data.copy())
                 
-                    if st.session_state.data['latitud'] and st.session_state.data['longitud']:
-                        try:
-                            lat = float(str(datos['latitud']).replace(',', '.'))
-                            lon = float(str(datos['longitud']).replace(',', '.'))
-                            mapa = StaticMap(600, 400)
-                            mapa.add_marker(CircleMarker((lon, lat), 'red', 12))
-                            img_map = mapa.render()
-                            buf_map = io.BytesIO()
-                            img_map.save(buf_map, format='PNG')
-                            buf_map.seek(0)
-                            datos['imgMapsProyecto'] = InlineImage(st.session_state.doc, buf_map, Cm(15), Cm(10))
-                        except Exception as e:
-                            st.error(f"Coordenadas inválidas para el mapa. {e}")
-                    else:
-                        st.error("Faltan coordenadas para el mapa.")
-                                
-                else:
-                            
-                    if st.session_state.data['latitud'] and st.session_state.data['longitud']:
-                        try:
-                            lat = float(str(st.session_state.data['latitud']).replace(',', '.'))
-                                
-                            lon = float(str(st.session_state.data['longitud']).replace(',', '.'))
-                                
-                            st.warning(f"Prueba de coordenada en modo rural (latitud): {lat}")
-                            st.warning(f"Prueba de coordenada en modo rural (longitud): {lon}")
-                                    
-                            png_bytes = get_map_png_bytes(lon, lat, buffer_m=300, zoom=17)
-                                    
-                            buf_map = io.BytesIO(png_bytes)
-                            buf_map.seek(0)
-                            datos['imgMapsProyecto'] = InlineImage(st.session_state.doc, buf_map, Cm(15), Cm(10))
-                        except Exception as e:
-                            st.error(f"Coordenadas inválidas para el mapa. {e}")
-                    else:
-                        st.error("Faltan coordenadas para el mapa.")
+                datos = st.session_state.data.copy()
                 
-                #st.session_state.doc = DocxTemplate(template_path)
-                st.session_state.doc.render(datos)
-                output_path = f"reporteProtocoloTermografia.docx"
-                st.session_state.doc.save(output_path)
-                st.success(f"Documento generado exitosamente: {output_path}")
-                with open(output_path, "rb") as file:
-                    btn = st.download_button(
-                        label="Descargar Informe Word",
-                        data=file,
-                        file_name=output_path,
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    )
+                try:
+                
+                    if st.session_state.data['tipoCoordenada'] == "Urbano":
                     
-            except Exception as e:
+                        if st.session_state.data['latitud'] and st.session_state.data['longitud']:
+                            try:
+                                lat = float(str(datos['latitud']).replace(',', '.'))
+                                lon = float(str(datos['longitud']).replace(',', '.'))
+                                mapa = StaticMap(600, 400)
+                                mapa.add_marker(CircleMarker((lon, lat), 'red', 12))
+                                img_map = mapa.render()
+                                buf_map = io.BytesIO()
+                                img_map.save(buf_map, format='PNG')
+                                buf_map.seek(0)
+                                datos['imgMapsProyecto'] = InlineImage(st.session_state.doc, buf_map, Cm(15), Cm(10))
+                            except Exception as e:
+                                st.error(f"Coordenadas inválidas para el mapa. {e}")
+                        else:
+                            st.error("Faltan coordenadas para el mapa.")
+                                    
+                    else:
+                                
+                        if st.session_state.data['latitud'] and st.session_state.data['longitud']:
+                            try:
+                                lat = float(str(st.session_state.data['latitud']).replace(',', '.'))
+                                    
+                                lon = float(str(st.session_state.data['longitud']).replace(',', '.'))
+                                    
+                                st.warning(f"Prueba de coordenada en modo rural (latitud): {lat}")
+                                st.warning(f"Prueba de coordenada en modo rural (longitud): {lon}")
+                                        
+                                png_bytes = get_map_png_bytes(lon, lat, buffer_m=300, zoom=17)
+                                        
+                                buf_map = io.BytesIO(png_bytes)
+                                buf_map.seek(0)
+                                datos['imgMapsProyecto'] = InlineImage(st.session_state.doc, buf_map, Cm(15), Cm(10))
+                            except Exception as e:
+                                st.error(f"Coordenadas inválidas para el mapa. {e}")
+                        else:
+                            st.error("Faltan coordenadas para el mapa.")
+                    
+                    #st.session_state.doc = DocxTemplate(template_path)
+                    st.session_state.doc.render(datos)
+                    output_path = f"reporteProtocoloTermografia.docx"
+                    st.session_state.doc.save(output_path)
+                    st.success(f"Documento generado exitosamente: {output_path}")
+                    with open(output_path, "rb") as file:
+                        btn = st.download_button(
+                            label="Descargar Informe Word",
+                            data=file,
+                            file_name=output_path,
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        )
+                        
+                except Exception as e:
+                    
+                    st.error(f"Error al generar el documento: {e}")
                 
+            except Exception as e:
                 st.error(f"Error al generar el documento: {e}")
-            
-        except Exception as e:
-            st.error(f"Error al generar el documento: {e}")
 
     
