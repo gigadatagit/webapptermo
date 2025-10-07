@@ -338,26 +338,20 @@ elif st.session_state.step == 2:
             st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaRs{suf}')), 2)
             st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaSt{suf}')), 2)
             st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaTr{suf}')), 2)
+            
+            st.session_state.data[f'clasificacionDeltaRs{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaRs{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[0]
+            st.session_state.data[f'clasificacionDeltaSt{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaSt{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[0]
+            st.session_state.data[f'clasificacionDeltaTr{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaTr{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[0]
 
-            try:
+            st.session_state.data[f'accionDeltaRs{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaRs{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[1]
+            st.session_state.data[f'accionDeltaSt{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaSt{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[1]
+            st.session_state.data[f'accionDeltaTr{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaTr{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[1]
 
-                st.session_state.data[f'clasificacionDeltaRs{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaRs{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[0]
-                st.session_state.data[f'clasificacionDeltaSt{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaSt{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[0]
-                st.session_state.data[f'clasificacionDeltaTr{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaTr{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[0]
+            st.session_state.data[f'deltaRs{suf}'] = f"{st.session_state.data.get(f'valNumDeltaRs{suf}')} °C ({st.session_state.data.get(f'clasificacionDeltaRs{suf}')} - {st.session_state.data.get(f'accionDeltaRs{suf}')})"
+            st.session_state.data[f'deltaSt{suf}'] = f"{st.session_state.data.get(f'valNumDeltaSt{suf}')} °C ({st.session_state.data.get(f'clasificacionDeltaSt{suf}')} - {st.session_state.data.get(f'accionDeltaSt{suf}')})"
+            st.session_state.data[f'deltaTr{suf}'] = f"{st.session_state.data.get(f'valNumDeltaTr{suf}')} °C ({st.session_state.data.get(f'clasificacionDeltaTr{suf}')} - {st.session_state.data.get(f'accionDeltaTr{suf}')})"
 
-                st.session_state.data[f'accionDeltaRs{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaRs{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[1]
-                st.session_state.data[f'accionDeltaSt{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaSt{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[1]
-                st.session_state.data[f'accionDeltaTr{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaTr{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[1]
-
-                st.session_state.data[f'deltaRs{suf}'] = f"{st.session_state.data.get(f'valNumDeltaRs{suf}')} °C ({st.session_state.data.get(f'clasificacionDeltaRs{suf}')} - {st.session_state.data.get(f'accionDeltaRs{suf}')})"
-                st.session_state.data[f'deltaSt{suf}'] = f"{st.session_state.data.get(f'valNumDeltaSt{suf}')} °C ({st.session_state.data.get(f'clasificacionDeltaSt{suf}')} - {st.session_state.data.get(f'accionDeltaSt{suf}')})"
-                st.session_state.data[f'deltaTr{suf}'] = f"{st.session_state.data.get(f'valNumDeltaTr{suf}')} °C ({st.session_state.data.get(f'clasificacionDeltaTr{suf}')} - {st.session_state.data.get(f'accionDeltaTr{suf}')})"
-
-            except Exception as e:
-                # Captura un error de conversión o cálculo si ocurre algo inesperado
-                st.error(f"Error en el cálculo para el Objeto #{i}: {e}")
-
-                break
+            
                 
                 
         todos_los_datos_completos = True
