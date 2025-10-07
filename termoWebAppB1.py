@@ -293,7 +293,7 @@ elif st.session_state.step == 2:
                 )
                 
                 
-            if st.session_state.data[f'tfaseR{suf}'] == 0.0 or st.session_state.data[f'tfaseS{suf}'] == 0.0 or st.session_state.data[f'tfaseT{suf}'] == 0.0:
+            if st.session_state.data[f'tfaseR{suf}'] == 0.0 or st.session_state.data[f'tfaseS{suf}'] == 0.0 or st.session_state.data[f'tfaseT{suf}'] == 0.0 or st.session_state.data[f'tempPromImgTermo{suf}'] == 0.0:
                 
                 pass
             
@@ -313,18 +313,18 @@ elif st.session_state.step == 2:
                     
                     
                 st.session_state.data[f'clasificacionDeltaRs{suf}'] = clasificar_delta(
-                    st.session_state.data[f'valNumDeltaRs{suf}'],
-                    st.session_state.data[f'tempPromImgTermo{suf}']
+                    float(st.session_state.data[f'valNumDeltaRs{suf}']),
+                    float(st.session_state.data[f'tempPromImgTermo{suf}'])
                 )[0]
                     
                 st.session_state.data[f'clasificacionDeltaSt{suf}'] = clasificar_delta(
-                    st.session_state.data[f'valNumDeltaSt{suf}'],
-                    st.session_state.data[f'tempPromImgTermo{suf}']
+                    float(st.session_state.data[f'valNumDeltaSt{suf}']),
+                    float(st.session_state.data[f'tempPromImgTermo{suf}'])
                 )[0]
                     
                 st.session_state.data[f'clasificacionDeltaTr{suf}'] = clasificar_delta(
-                    st.session_state.data[f'valNumDeltaTr{suf}'],
-                    st.session_state.data[f'tempPromImgTermo{suf}']
+                    float(st.session_state.data[f'valNumDeltaTr{suf}']),
+                    float(st.session_state.data[f'tempPromImgTermo{suf}'])
                 )[0]
                     
                     
