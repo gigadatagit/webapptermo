@@ -338,34 +338,31 @@ elif st.session_state.step == 2:
                 
                 # Si todos los campos críticos están llenos, realiza los cálculos
                 try:
-                    temp_r = safe_float_convert(f'tfaseR{suf}')
-                    temp_s = safe_float_convert(f'tfaseS{suf}')
-                    temp_t = safe_float_convert(f'tfaseT{suf}')
-                    temp_prom = safe_float_convert(f'tempPromImgTermo{suf}')
+                    
+                    st.session_state.data[f'tfaseR{suf}'] = isinstance(st.session_state.data[f'tfaseR{suf}'], (int, float)) and float(st.session_state.data[f'tfaseR{suf}']) or float(str(st.session_state.data[f'tfaseR{suf}']).replace(',', '.'))
+                    st.session_state.data[f'tfaseS{suf}'] = isinstance(st.session_state.data[f'tfaseS{suf}'], (int, float)) and float(st.session_state.data[f'tfaseS{suf}']) or float(str(st.session_state.data[f'tfaseS{suf}']).replace(',', '.'))
+                    st.session_state.data[f'tfaseT{suf}'] = isinstance(st.session_state.data[f'tfaseT{suf}'], (int, float)) and float(st.session_state.data[f'tfaseT{suf}']) or float(str(st.session_state.data[f'tfaseT{suf}']).replace(',', '.'))
+                    st.session_state.data[f'tempPromImgTermo{suf}'] = isinstance(st.session_state.data[f'tempPromImgTermo{suf}'], (int, float)) and float(st.session_state.data[f'tempPromImgTermo{suf}']) or float(str(st.session_state.data[f'tempPromImgTermo{suf}']).replace(',', '.'))
+                    
 
                     # CÁLCULOS
-                    st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(temp_r - temp_s), 2)
-                    st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(temp_s - temp_t), 2)
-                    st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(temp_t - temp_r), 2)
+                    st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(st.session_state.data[f'tfaseR{suf}'] - st.session_state.data[f'tempPromImgTermo{suf}']), 2)
+                    st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(st.session_state.data[f'tfaseS{suf}'] - st.session_state.data[f'tempPromImgTermo{suf}']), 2)
+                    st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(st.session_state.data[f'tfaseT{suf}'] - st.session_state.data[f'tempPromImgTermo{suf}']), 2)
 
-                    # CLASIFICACIÓN
-                    val_rs = st.session_state.data[f'valNumDeltaRs{suf}']
-                    val_st = st.session_state.data[f'valNumDeltaSt{suf}']
-                    val_tr = st.session_state.data[f'valNumDeltaTr{suf}']
-
-                    st.session_state.data[f'clasificacionDeltaRs{suf}'], st.session_state.data[f'accionDeltaRs{suf}'] = clasificar_delta(val_rs, temp_prom)
-                    st.session_state.data[f'clasificacionDeltaSt{suf}'], st.session_state.data[f'accionDeltaSt{suf}'] = clasificar_delta(val_st, temp_prom)
-                    st.session_state.data[f'clasificacionDeltaTr{suf}'], st.session_state.data[f'accionDeltaTr{suf}'] = clasificar_delta(val_tr, temp_prom)
+                    st.session_state.data[f'clasificacionDeltaRs{suf}'], st.session_state.data[f'accionDeltaRs{suf}'] = clasificar_delta(st.session_state.data[f'valNumDeltaRs{suf}'], st.session_state.data[f'tempPromImgTermo{suf}'])
+                    st.session_state.data[f'clasificacionDeltaSt{suf}'], st.session_state.data[f'accionDeltaSt{suf}'] = clasificar_delta(st.session_state.data[f'valNumDeltaSt{suf}'], st.session_state.data[f'tempPromImgTermo{suf}'])
+                    st.session_state.data[f'clasificacionDeltaTr{suf}'], st.session_state.data[f'accionDeltaTr{suf}'] = clasificar_delta(st.session_state.data[f'valNumDeltaTr{suf}'], st.session_state.data[f'tempPromImgTermo{suf}'])
 
                     # FORMATO FINAL (para el Word)
-                    st.session_state.data[f'deltaRs{suf}'] = f"{val_rs} °C ({st.session_state.data[f'clasificacionDeltaRs{suf}']} - {st.session_state.data[f'accionDeltaRs{suf}']})"
-                    st.session_state.data[f'deltaSt{suf}'] = f"{val_st} °C ({st.session_state.data[f'clasificacionDeltaSt{suf}']} - {st.session_state.data[f'accionDeltaSt{suf}']})"
-                    st.session_state.data[f'deltaTr{suf}'] = f"{val_tr} °C ({st.session_state.data[f'clasificacionDeltaTr{suf}']} - {st.session_state.data[f'accionDeltaTr{suf}']})"
+                    st.session_state.data[f'deltaRs{suf}'] = f"{st.session_state.data[f'valNumDeltaRs{suf}']} °C ({st.session_state.data[f'clasificacionDeltaRs{suf}']} - {st.session_state.data[f'accionDeltaRs{suf}']})"
+                    st.session_state.data[f'deltaSt{suf}'] = f"{st.session_state.data[f'valNumDeltaSt{suf}']} °C ({st.session_state.data[f'clasificacionDeltaSt{suf}']} - {st.session_state.data[f'accionDeltaSt{suf}']})"
+                    st.session_state.data[f'deltaTr{suf}'] = f"{st.session_state.data[f'valNumDeltaTr{suf}']} °C ({st.session_state.data[f'clasificacionDeltaTr{suf}']} - {st.session_state.data[f'accionDeltaTr{suf}']})"
 
                 except Exception as e:
                     # Captura un error de conversión o cálculo si ocurre algo inesperado
                     st.error(f"Error en el cálculo para el Objeto #{i}: {e}")
-                    todos_los_datos_completos = False
+
                     break
             
             try:
