@@ -318,38 +318,6 @@ elif st.session_state.step == 2:
                 todos_los_datos_completos = False
                 break # Detiene el bucle en el primer objeto incompleto
 
-            # Si todos los campos críticos están llenos, realiza los cálculos
-            try:
-                temp_r = safe_float_convert(f'tfaseR{suf}')
-                temp_s = safe_float_convert(f'tfaseS{suf}')
-                temp_t = safe_float_convert(f'tfaseT{suf}')
-                temp_prom = safe_float_convert(f'tempPromImgTermo{suf}')
-
-                # CÁLCULOS
-                st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(temp_r - temp_s), 2)
-                st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(temp_s - temp_t), 2)
-                st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(temp_t - temp_r), 2)
-
-                # CLASIFICACIÓN
-                val_rs = st.session_state.data[f'valNumDeltaRs{suf}']
-                val_st = st.session_state.data[f'valNumDeltaSt{suf}']
-                val_tr = st.session_state.data[f'valNumDeltaTr{suf}']
-
-                st.session_state.data[f'clasificacionDeltaRs{suf}'], st.session_state.data[f'accionDeltaRs{suf}'] = clasificar_delta(val_rs, temp_prom)
-                st.session_state.data[f'clasificacionDeltaSt{suf}'], st.session_state.data[f'accionDeltaSt{suf}'] = clasificar_delta(val_st, temp_prom)
-                st.session_state.data[f'clasificacionDeltaTr{suf}'], st.session_state.data[f'accionDeltaTr{suf}'] = clasificar_delta(val_tr, temp_prom)
-
-                # FORMATO FINAL (para el Word)
-                st.session_state.data[f'deltaRs{suf}'] = f"{val_rs} °C ({st.session_state.data[f'clasificacionDeltaRs{suf}']} - {st.session_state.data[f'accionDeltaRs{suf}']})"
-                st.session_state.data[f'deltaSt{suf}'] = f"{val_st} °C ({st.session_state.data[f'clasificacionDeltaSt{suf}']} - {st.session_state.data[f'accionDeltaSt{suf}']})"
-                st.session_state.data[f'deltaTr{suf}'] = f"{val_tr} °C ({st.session_state.data[f'clasificacionDeltaTr{suf}']} - {st.session_state.data[f'accionDeltaTr{suf}']})"
-
-            except Exception as e:
-                # Captura un error de conversión o cálculo si ocurre algo inesperado
-                st.error(f"Error en el cálculo para el Objeto #{i}: {e}")
-                todos_los_datos_completos = False
-                break
-
         # 2. Generación del Word (SOLO si todos los objetos están completos)
         if todos_los_datos_completos:
             
@@ -367,6 +335,38 @@ elif st.session_state.step == 2:
                 buf_ImgEsp = io.BytesIO(st.session_state.data[key_ImgEsp].read()) if st.session_state.data[key_ImgEsp] else None
                 buf_ImgEsp.seek(0)
                 datos[key_ImgEsp] = InlineImage(st.session_state.doc, buf_ImgEsp, Cm(7.5), Cm(6.5))
+                
+                # Si todos los campos críticos están llenos, realiza los cálculos
+                try:
+                    temp_r = safe_float_convert(f'tfaseR{suf}')
+                    temp_s = safe_float_convert(f'tfaseS{suf}')
+                    temp_t = safe_float_convert(f'tfaseT{suf}')
+                    temp_prom = safe_float_convert(f'tempPromImgTermo{suf}')
+
+                    # CÁLCULOS
+                    st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(temp_r - temp_s), 2)
+                    st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(temp_s - temp_t), 2)
+                    st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(temp_t - temp_r), 2)
+
+                    # CLASIFICACIÓN
+                    val_rs = st.session_state.data[f'valNumDeltaRs{suf}']
+                    val_st = st.session_state.data[f'valNumDeltaSt{suf}']
+                    val_tr = st.session_state.data[f'valNumDeltaTr{suf}']
+
+                    st.session_state.data[f'clasificacionDeltaRs{suf}'], st.session_state.data[f'accionDeltaRs{suf}'] = clasificar_delta(val_rs, temp_prom)
+                    st.session_state.data[f'clasificacionDeltaSt{suf}'], st.session_state.data[f'accionDeltaSt{suf}'] = clasificar_delta(val_st, temp_prom)
+                    st.session_state.data[f'clasificacionDeltaTr{suf}'], st.session_state.data[f'accionDeltaTr{suf}'] = clasificar_delta(val_tr, temp_prom)
+
+                    # FORMATO FINAL (para el Word)
+                    st.session_state.data[f'deltaRs{suf}'] = f"{val_rs} °C ({st.session_state.data[f'clasificacionDeltaRs{suf}']} - {st.session_state.data[f'accionDeltaRs{suf}']})"
+                    st.session_state.data[f'deltaSt{suf}'] = f"{val_st} °C ({st.session_state.data[f'clasificacionDeltaSt{suf}']} - {st.session_state.data[f'accionDeltaSt{suf}']})"
+                    st.session_state.data[f'deltaTr{suf}'] = f"{val_tr} °C ({st.session_state.data[f'clasificacionDeltaTr{suf}']} - {st.session_state.data[f'accionDeltaTr{suf}']})"
+
+                except Exception as e:
+                    # Captura un error de conversión o cálculo si ocurre algo inesperado
+                    st.error(f"Error en el cálculo para el Objeto #{i}: {e}")
+                    todos_los_datos_completos = False
+                    break
             
             try:
                 
