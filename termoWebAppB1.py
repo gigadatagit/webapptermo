@@ -325,21 +325,21 @@ elif st.session_state.step == 2:
             buf_ImgEsp = io.BytesIO(st.session_state.data[key_ImgEsp].read()) if st.session_state.data[key_ImgEsp] else None
             buf_ImgEsp.seek(0)
             datos[key_ImgEsp] = InlineImage(st.session_state.doc, buf_ImgEsp, Cm(7.5), Cm(6.5))
+            
+            st.session_state.data[f'tNfaseR{suf}'] = st.session_state.data.get(f'tfaseR{suf}')
+            st.session_state.data[f'tNfaseS{suf}'] = st.session_state.data.get(f'tfaseS{suf}')
+            st.session_state.data[f'tNfaseT{suf}'] = st.session_state.data.get(f'tfaseT{suf}')
+            st.session_state.data[f'tempNPromImgTermo{suf}'] = st.session_state.data.get(f'tempPromImgTermo{suf}')
+                
+            st.session_state.data[f'valNumResDeltaRs{suf}'] = float(st.session_state.data.get(f'tNfaseR{suf}')) - float(st.session_state.data.get(f'tNfaseS{suf}'))
+            st.session_state.data[f'valNumResDeltaSt{suf}'] = float(st.session_state.data.get(f'tNfaseS{suf}')) - float(st.session_state.data.get(f'tNfaseT{suf}'))
+            st.session_state.data[f'valNumResDeltaTr{suf}'] = float(st.session_state.data.get(f'tNfaseT{suf}')) - float(st.session_state.data.get(f'tNfaseR{suf}'))
+                
+            st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaRs{suf}')), 2)
+            st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaSt{suf}')), 2)
+            st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaTr{suf}')), 2)
 
             try:
-                
-                st.session_state.data[f'tNfaseR{suf}'] = st.session_state.data.get(f'tfaseR{suf}')
-                st.session_state.data[f'tNfaseS{suf}'] = st.session_state.data.get(f'tfaseS{suf}')
-                st.session_state.data[f'tNfaseT{suf}'] = st.session_state.data.get(f'tfaseT{suf}')
-                st.session_state.data[f'tempNPromImgTermo{suf}'] = st.session_state.data.get(f'tempPromImgTermo{suf}')
-                
-                st.session_state.data[f'valNumResDeltaRs{suf}'] = float(st.session_state.data.get(f'tNfaseR{suf}')) - float(st.session_state.data.get(f'tNfaseS{suf}'))
-                st.session_state.data[f'valNumResDeltaSt{suf}'] = float(st.session_state.data.get(f'tNfaseS{suf}')) - float(st.session_state.data.get(f'tNfaseT{suf}'))
-                st.session_state.data[f'valNumResDeltaTr{suf}'] = float(st.session_state.data.get(f'tNfaseT{suf}')) - float(st.session_state.data.get(f'tNfaseR{suf}'))
-                
-                st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaRs{suf}')), 2)
-                st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaSt{suf}')), 2)
-                st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(st.session_state.data.get(f'valNumResDeltaTr{suf}')), 2)
 
                 st.session_state.data[f'clasificacionDeltaRs{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaRs{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[0]
                 st.session_state.data[f'clasificacionDeltaSt{suf}'] = clasificar_delta(float(st.session_state.data.get(f'valNumDeltaSt{suf}')), float(st.session_state.data.get(f'tempNPromImgTermo{suf}')))[0]
