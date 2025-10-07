@@ -237,7 +237,7 @@ elif st.session_state.step == 2:
                 )
             with col3:
                 st.session_state.data[f'tempPromImgTermo{suf}'] = st.number_input(
-                    f"Temperatura Promedio {suf} [°C]", key=f'tempPromImgTermo{suf}', min_value=0.0, format="%.2f"
+                    f"Temperatura Promedio {suf} [°C]", key=f'tempPromImgTermo{suf}', format="%.2f"
                 )
             with col4:
                 st.session_state.data[f'emisividadImgTermo{suf}'] = st.number_input(
@@ -291,64 +291,6 @@ elif st.session_state.step == 2:
                 st.session_state.data[f'conclusiones{suf}'] = st.text_area(
                     f"Conclusiones de la Tabla {suf}", key=f'conclusiones{suf}'
                 )
-                
-                
-            if st.session_state.data[f'tfaseR{suf}'] == 0.0 or st.session_state.data[f'tfaseS{suf}'] == 0.0 or st.session_state.data[f'tfaseT{suf}'] == 0.0 or st.session_state.data[f'tempPromImgTermo{suf}'] == 0.0:
-                
-                pass
-            
-            else:
-                
-                st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(
-                    st.session_state.data[f'tfaseR{suf}'] - st.session_state.data[f'tfaseS{suf}']
-                ) if f'tfaseR{suf}' in st.session_state.data and f'tfaseS{suf}' in st.session_state.data else 0.0, 2)
-                        
-                st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(
-                    st.session_state.data[f'tfaseS{suf}'] - st.session_state.data[f'tfaseT{suf}']
-                ) if f'tfaseS{suf}' in st.session_state.data and f'tfaseT{suf}' in st.session_state.data else 0.0, 2)
-                    
-                st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(
-                    st.session_state.data[f'tfaseT{suf}'] - st.session_state.data[f'tfaseR{suf}']
-                ) if f'tfaseT{suf}' in st.session_state.data and f'tfaseR{suf}' in st.session_state.data else 0.0, 2)
-                    
-                    
-                st.session_state.data[f'clasificacionDeltaRs{suf}'] = clasificar_delta(
-                    float(st.session_state.data[f'valNumDeltaRs{suf}']),
-                    float(st.session_state.data[f'tempPromImgTermo{suf}'])
-                )[0]
-                    
-                st.session_state.data[f'clasificacionDeltaSt{suf}'] = clasificar_delta(
-                    float(st.session_state.data[f'valNumDeltaSt{suf}']),
-                    float(st.session_state.data[f'tempPromImgTermo{suf}'])
-                )[0]
-                    
-                st.session_state.data[f'clasificacionDeltaTr{suf}'] = clasificar_delta(
-                    float(st.session_state.data[f'valNumDeltaTr{suf}']),
-                    float(st.session_state.data[f'tempPromImgTermo{suf}'])
-                )[0]
-                    
-                    
-                st.session_state.data[f'accionDeltaRs{suf}'] = clasificar_delta(
-                    st.session_state.data[f'valNumDeltaRs{suf}'],
-                    st.session_state.data[f'tempPromImgTermo{suf}']
-                )[1]
-                    
-                st.session_state.data[f'accionDeltaSt{suf}'] = clasificar_delta(
-                    st.session_state.data[f'valNumDeltaSt{suf}'],
-                    st.session_state.data[f'tempPromImgTermo{suf}']
-                )[1]
-                    
-                st.session_state.data[f'accionDeltaTr{suf}'] = clasificar_delta(
-                    st.session_state.data[f'valNumDeltaTr{suf}'],
-                    st.session_state.data[f'tempPromImgTermo{suf}']
-                )[1]
-                    
-
-                st.session_state.data[f'deltaRs{suf}'] = f"{st.session_state.data[f'valNumDeltaRs{suf}']} °C ({st.session_state.data[f'clasificacionDeltaRs{suf}']} - {st.session_state.data[f'accionDeltaRs{suf}']})"
-
-                st.session_state.data[f'deltaSt{suf}'] = f"{st.session_state.data[f'valNumDeltaSt{suf}']} °C ({st.session_state.data[f'clasificacionDeltaSt{suf}']} - {st.session_state.data[f'accionDeltaSt{suf}']})"
-
-                st.session_state.data[f'deltaTr{suf}'] = f"{st.session_state.data[f'valNumDeltaTr{suf}']} °C ({st.session_state.data[f'clasificacionDeltaTr{suf}']} - {st.session_state.data[f'accionDeltaTr{suf}']})"
 
 
             ahora = datetime.now()
@@ -358,70 +300,129 @@ elif st.session_state.step == 2:
             datos['anio'] = ahora.year
 
             st.markdown("---")
-        
-    
     
     
     cols = st.columns(1)
     if cols[0].button("Finalizar Formulario y Generar Word"):
-        #next_step()
         
+        cantidad_objetos = int(st.session_state.data['cantidadObjetos'])
+        todos_los_datos_completos = True
         
+        # 1. Bucle de validación y cálculo (Ejecutar solo al presionar el botón)
+        for i in range(1, cantidad_objetos + 1):
+            suf = f"N{i}"
+            
+            # Campos críticos que deben ser != None para el cálculo
+            campos_criticos = [
+                f'tfaseR{suf}', f'tfaseS{suf}', f'tfaseT{suf}', f'tempPromImgTermo{suf}'
+            ]
+            
+            # Validar que los campos críticos no sean None (o 0.0 si no pudiste evitarlo)
+            # Usando 'is None' si modificaste los st.number_input (Recomendado)
+            if any(st.session_state.data.get(k) is None for k in campos_criticos):
+                st.error(f"Faltan valores en las temperaturas de fase o promedio para el Objeto #{i}. Por favor, verifique y complete.")
+                todos_los_datos_completos = False
+                break # Detiene el bucle en el primer objeto incompleto
+
+            # Si todos los campos críticos están llenos, realiza los cálculos
+            try:
+                temp_r = float(st.session_state.data[f'tfaseR{suf}'])
+                temp_s = float(st.session_state.data[f'tfaseS{suf}'])
+                temp_t = float(st.session_state.data[f'tfaseT{suf}'])
+                temp_prom = float(st.session_state.data[f'tempPromImgTermo{suf}'])
+
+                # CÁLCULOS
+                st.session_state.data[f'valNumDeltaRs{suf}'] = round(abs(temp_r - temp_s), 2)
+                st.session_state.data[f'valNumDeltaSt{suf}'] = round(abs(temp_s - temp_t), 2)
+                st.session_state.data[f'valNumDeltaTr{suf}'] = round(abs(temp_t - temp_r), 2)
+
+                # CLASIFICACIÓN
+                val_rs = st.session_state.data[f'valNumDeltaRs{suf}']
+                val_st = st.session_state.data[f'valNumDeltaSt{suf}']
+                val_tr = st.session_state.data[f'valNumDeltaTr{suf}']
+
+                st.session_state.data[f'clasificacionDeltaRs{suf}'], st.session_state.data[f'accionDeltaRs{suf}'] = clasificar_delta(val_rs, temp_prom)
+                st.session_state.data[f'clasificacionDeltaSt{suf}'], st.session_state.data[f'accionDeltaSt{suf}'] = clasificar_delta(val_st, temp_prom)
+                st.session_state.data[f'clasificacionDeltaTr{suf}'], st.session_state.data[f'accionDeltaTr{suf}'] = clasificar_delta(val_tr, temp_prom)
+
+                # FORMATO FINAL (para el Word)
+                st.session_state.data[f'deltaRs{suf}'] = f"{val_rs} °C ({st.session_state.data[f'clasificacionDeltaRs{suf}']} - {st.session_state.data[f'accionDeltaRs{suf}']})"
+                st.session_state.data[f'deltaSt{suf}'] = f"{val_st} °C ({st.session_state.data[f'clasificacionDeltaSt{suf}']} - {st.session_state.data[f'accionDeltaSt{suf}']})"
+                st.session_state.data[f'deltaTr{suf}'] = f"{val_tr} °C ({st.session_state.data[f'clasificacionDeltaTr{suf}']} - {st.session_state.data[f'accionDeltaTr{suf}']})"
+
+            except Exception as e:
+                # Captura un error de conversión o cálculo si ocurre algo inesperado
+                st.error(f"Error en el cálculo para el Objeto #{i}: {e}")
+                todos_los_datos_completos = False
+                break
+
+    # 2. Generación del Word (SOLO si todos los objetos están completos)
+    if todos_los_datos_completos:
         try:
+            # Asegúrate de que los 'datos' para el renderizado incluyan todos los nuevos cálculos
+            #datos = convertir_a_mayusculas(st.session_state.data.copy())
             
-            if st.session_state.data['tipoCoordenada'] == "Urbano":
+            datos = st.session_state.data.copy()
             
-                if st.session_state.data['latitud'] and st.session_state.data['longitud']:
-                    try:
-                        lat = float(str(datos['latitud']).replace(',', '.'))
-                        lon = float(str(datos['longitud']).replace(',', '.'))
-                        mapa = StaticMap(600, 400)
-                        mapa.add_marker(CircleMarker((lon, lat), 'red', 12))
-                        img_map = mapa.render()
-                        buf_map = io.BytesIO()
-                        img_map.save(buf_map, format='PNG')
-                        buf_map.seek(0)
-                        datos['imgMapsProyecto'] = InlineImage(st.session_state.doc, buf_map, Cm(15), Cm(10))
-                    except Exception as e:
-                        st.error(f"Coordenadas inválidas para el mapa. {e}")
-                else:
-                    st.error("Faltan coordenadas para el mapa.")
-                            
-            else:
-                        
-                if st.session_state.data['latitud'] and st.session_state.data['longitud']:
-                    try:
-                        lat = float(str(st.session_state.data['latitud']).replace(',', '.'))
-                            
-                        lon = float(str(st.session_state.data['longitud']).replace(',', '.'))
-                            
-                        st.warning(f"Prueba de coordenada en modo rural (latitud): {lat}")
-                        st.warning(f"Prueba de coordenada en modo rural (longitud): {lon}")
-                                
-                        png_bytes = get_map_png_bytes(lon, lat, buffer_m=300, zoom=17)
-                                
-                        buf_map = io.BytesIO(png_bytes)
-                        buf_map.seek(0)
-                        datos['imgMapsProyecto'] = InlineImage(st.session_state.doc, buf_map, Cm(15), Cm(10))
-                    except Exception as e:
-                        st.error(f"Coordenadas inválidas para el mapa. {e}")
-                else:
-                    st.error("Faltan coordenadas para el mapa.")
+            try:
             
-            #st.session_state.doc = DocxTemplate(template_path)
-            st.session_state.doc.render(datos)
-            output_path = f"reporteProtocoloTermografia.docx"
-            st.session_state.doc.save(output_path)
-            st.success(f"Documento generado exitosamente: {output_path}")
-            with open(output_path, "rb") as file:
-                btn = st.download_button(
-                    label="Descargar Informe Word",
-                    data=file,
-                    file_name=output_path,
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                )
+                if st.session_state.data['tipoCoordenada'] == "Urbano":
                 
-        except Exception as e:
+                    if st.session_state.data['latitud'] and st.session_state.data['longitud']:
+                        try:
+                            lat = float(str(datos['latitud']).replace(',', '.'))
+                            lon = float(str(datos['longitud']).replace(',', '.'))
+                            mapa = StaticMap(600, 400)
+                            mapa.add_marker(CircleMarker((lon, lat), 'red', 12))
+                            img_map = mapa.render()
+                            buf_map = io.BytesIO()
+                            img_map.save(buf_map, format='PNG')
+                            buf_map.seek(0)
+                            datos['imgMapsProyecto'] = InlineImage(st.session_state.doc, buf_map, Cm(15), Cm(10))
+                        except Exception as e:
+                            st.error(f"Coordenadas inválidas para el mapa. {e}")
+                    else:
+                        st.error("Faltan coordenadas para el mapa.")
+                                
+                else:
+                            
+                    if st.session_state.data['latitud'] and st.session_state.data['longitud']:
+                        try:
+                            lat = float(str(st.session_state.data['latitud']).replace(',', '.'))
+                                
+                            lon = float(str(st.session_state.data['longitud']).replace(',', '.'))
+                                
+                            st.warning(f"Prueba de coordenada en modo rural (latitud): {lat}")
+                            st.warning(f"Prueba de coordenada en modo rural (longitud): {lon}")
+                                    
+                            png_bytes = get_map_png_bytes(lon, lat, buffer_m=300, zoom=17)
+                                    
+                            buf_map = io.BytesIO(png_bytes)
+                            buf_map.seek(0)
+                            datos['imgMapsProyecto'] = InlineImage(st.session_state.doc, buf_map, Cm(15), Cm(10))
+                        except Exception as e:
+                            st.error(f"Coordenadas inválidas para el mapa. {e}")
+                    else:
+                        st.error("Faltan coordenadas para el mapa.")
+                
+                #st.session_state.doc = DocxTemplate(template_path)
+                st.session_state.doc.render(datos)
+                output_path = f"reporteProtocoloTermografia.docx"
+                st.session_state.doc.save(output_path)
+                st.success(f"Documento generado exitosamente: {output_path}")
+                with open(output_path, "rb") as file:
+                    btn = st.download_button(
+                        label="Descargar Informe Word",
+                        data=file,
+                        file_name=output_path,
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    )
+                    
+            except Exception as e:
+                
+                st.error(f"Error al generar el documento: {e}")
             
+        except Exception as e:
             st.error(f"Error al generar el documento: {e}")
+
     
