@@ -385,9 +385,9 @@ elif st.session_state.step == 2:
                 
                 
                 
-                st.session_state.doc.render(datos)
-                output_path = f"reporteProtocoloTermografia.docx"
-                st.session_state.doc.save(output_path)
+                #st.session_state.doc.render(datos)
+                #output_path = f"reporteProtocoloTermografia.docx"
+                #st.session_state.doc.save(output_path)
                 
                 try:
                 
@@ -429,6 +429,11 @@ elif st.session_state.step == 2:
                                 st.error(f"Coordenadas inválidas para el mapa. {e}")
                         else:
                             st.error("Faltan coordenadas para el mapa.")
+                            
+                            
+                    st.session_state.doc.render(datos)
+                    output_path = f"reporteProtocoloTermografia.docx"
+                    st.session_state.doc.save(output_path)
                     
                     st.success(f"Documento generado exitosamente: {output_path}")
                     with open(output_path, "rb") as file:
