@@ -312,6 +312,12 @@ elif st.session_state.step == 2:
         cantidad_objetos = int(st.session_state.data['cantidadObjetos'])
         
         datos = convertir_a_mayusculas(st.session_state.data.copy())
+        
+        print("Estado de la variable datos antes del procesamiento de imágenes y cálculos:")
+        
+        print(datos)
+        
+        print("******"*50)
             
         for i in range(1, cantidad_objetos + 1):
             suf = f"N{i}"
@@ -351,7 +357,9 @@ elif st.session_state.step == 2:
             st.session_state.data[f'deltaSt{suf}'] = f"{st.session_state.data.get(f'valNumDeltaSt{suf}')} °C ({st.session_state.data.get(f'clasificacionDeltaSt{suf}')} - {st.session_state.data.get(f'accionDeltaSt{suf}')})"
             st.session_state.data[f'deltaTr{suf}'] = f"{st.session_state.data.get(f'valNumDeltaTr{suf}')} °C ({st.session_state.data.get(f'clasificacionDeltaTr{suf}')} - {st.session_state.data.get(f'accionDeltaTr{suf}')})"
 
+            print(datos)
             
+            print("------"*50)
                 
                 
         todos_los_datos_completos = True
@@ -430,6 +438,10 @@ elif st.session_state.step == 2:
                         else:
                             st.error("Faltan coordenadas para el mapa.")
                             
+                    print("******"*50)
+                    print("Datos antes de renderizar el documento:")
+                    print(datos)
+                    print("******"*50)
                             
                     st.session_state.doc.render(datos)
                     output_path = f"reporteProtocoloTermografia.docx"
